@@ -1,0 +1,12 @@
+[package]
+name = "mapbox"
+version = "0.1.0"
+authors = ["Rasmus Kildevæld <rasmuskildevaeld@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+mapbox-sys = { path = "../mapbox-sys" }
+image = "0.23"
+

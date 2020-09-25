@@ -1,0 +1,3 @@
+[submodule "vendor/mapbox"]
+	path = vendor/mapbox
+	url = https://github.com/mapbox/mapbox-gl-native.git

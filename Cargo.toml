@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "rust/mapbox-sys",
+    "rust/mapbox"
+]

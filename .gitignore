@@ -1,0 +1,6 @@
+build/
+*.jpg
+*.jpeg
+*.png
+.vscode
+target/

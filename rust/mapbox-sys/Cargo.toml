@@ -1,0 +1,11 @@
+[package]
+name = "mapbox-sys"
+version = "0.1.0"
+authors = ["Rasmus Kildevæld <rasmuskildevaeld@gmail.com>"]
+edition = "2018"
+
+[build-dependencies]
+cmake = "0.1"
+bindgen = "0.55"
+pkg-config = "0.3"
+cc = "1"
