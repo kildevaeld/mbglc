@@ -1,5 +1,5 @@
 name: "Mbglc Compiler"
-description: "Greet someone and record the time"
+description: "Compile mapbox and mbglc"
 runs:
   using: "docker"
   image: "Dockerfile"
