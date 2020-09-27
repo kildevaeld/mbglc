@@ -12,6 +12,8 @@
 #include <thread>
 #include <chrono>
 
+#include <iostream>
+
 using namespace mbgl;
 
 struct mbgl_map

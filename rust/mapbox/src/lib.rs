@@ -21,13 +21,14 @@ impl Drop for Map {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct MapOptions<'a> {
-    width: u32,
-    height: u32,
-    pixel_ratio: i32,
-    access_token: Option<&'a str>,
-    cache_path: Option<&'a str>,
-    assets_path: Option<&'a str>,
+    pub width: u32,
+    pub height: u32,
+    pub pixel_ratio: i32,
+    pub access_token: Option<&'a str>,
+    pub cache_path: Option<&'a str>,
+    pub assets_path: Option<&'a str>,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -77,6 +78,14 @@ impl Map {
         }
     }
 
+    pub fn load_style(&self, style: &str) -> &Self {
+        unsafe {
+            let c = std::ffi::CString::new(style).unwrap();
+            sys::mbgl_map_load_style_url(self.raw, c.as_ptr());
+        }
+        self
+    }
+
     pub fn set_size(&self, size: Size) -> &Self {
         unsafe {
             sys::mbgl_map_set_size(self.raw, size.0 as i32, size.1 as i32);
@@ -117,13 +126,16 @@ impl Map {
         let (lraw, raw) = unsafe {
             let rloop = sys::mbgl_run_loop_create(ty as u32);
 
+            let token = match opts.access_token {
+                Some(s) => std::ffi::CString::new(s).unwrap(),
+                None => std::ffi::CString::new("").unwrap(),
+            };
+
             let map = sys::mbgl_map_create(
                 opts.width as i32,
                 opts.height as i32,
                 opts.pixel_ratio,
-                opts.access_token
-                    .map(|s| std::ffi::CString::new(s).unwrap().as_ptr())
-                    .unwrap_or_else(|| std::ptr::null()),
+                token.as_ptr(),
                 opts.cache_path
                     .map(|s| std::ffi::CString::new(s).unwrap().as_ptr())
                     .unwrap_or_else(|| std::ptr::null()),

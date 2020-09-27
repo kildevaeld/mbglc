@@ -12,6 +12,15 @@ int main()
         exit(1);
     }
 
+    mbgl_map_options_t opts = {
+        .width = 512,
+        .height = 512,
+        .pixel_ratio = 1,
+        .access_token = token,
+        .cache_path = NULL,
+        .assets_path = NULL,
+        .base_url = NULL};
+
     mbgl_run_loop_t *loop = mbgl_run_loop_create(DEFAULT_RUNLOOP);
 
     mbgl_map_t *map = mbgl_map_create(1280, 1024, 1, token, NULL, NULL);

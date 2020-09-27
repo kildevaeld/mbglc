@@ -100,6 +100,7 @@ fn main() {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=wrapper.c");
     println!("cargo:rerun-if-changed=wrapper.h");
+    println!("cargo:rerun-if-changed=../../src/mbglc.cpp");
 
     env::set_var("CC", "clang");
     env::set_var("CXX", "clang++");

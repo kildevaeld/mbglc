@@ -9,8 +9,8 @@ extern "C"
 
     typedef struct mbgl_latlng
     {
-        double lng;
         double lat;
+        double lng;
     } mbgl_latlng_t;
 
     typedef enum mbgl_runloop_type
@@ -18,6 +18,17 @@ extern "C"
         NEW_RUNLOOP,
         DEFAULT_RUNLOOP
     } mbgl_runloop_type;
+
+    typedef struct mbgl_map_options
+    {
+        int width;
+        int height;
+        int pixel_ratio;
+        const char *access_token;
+        const char *cache_path;
+        const char *assets_path;
+        const char *base_url;
+    } mbgl_map_options_t;
 
     typedef struct mbgl_run_loop mbgl_run_loop_t;
     typedef struct mbgl_map mbgl_map_t;
@@ -39,7 +50,6 @@ extern "C"
     void mbgl_map_load_style_url(mbgl_map_t *, const char *url);
 
     char *mbgl_map_render(mbgl_map_t *, size_t *);
-
 
 #ifdef __cplusplus
 }
