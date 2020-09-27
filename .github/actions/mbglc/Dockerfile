@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:19.10
 
 ENV TZ=Europe/Copenhagen
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
