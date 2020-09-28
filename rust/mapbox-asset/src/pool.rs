@@ -44,6 +44,11 @@ struct MapPoolInner {
     producer: Sender<(Request, Sender<Option<DynamicImage>>)>,
 }
 
+struct MapState {
+    style: String,
+    size: Size,
+}
+
 impl MapPoolInner {
     fn new(options: MapPoolOptions) -> MapPoolInner {
         let mut workers = Vec::new();
@@ -68,7 +73,12 @@ impl MapPoolInner {
                     )
                     .unwrap();
 
-                    map.load_style("mapbox://styles/mapbox/streets-v11");
+                    let mut state = MapState {
+                        style: "mapbox://styles/mapbox/streets-v11".to_owned(),
+                        size: opts.size,
+                    };
+
+                    map.load_style(&state.style);
 
                     loop {
                         let (req, done) = select! {
@@ -77,8 +87,17 @@ impl MapPoolInner {
                             },
                             recv(work_chan) -> req => req.expect("work chan closed")
                         };
-                        map.load_style(&req.style);
-                        map.set_size(req.size);
+
+                        if state.style != req.style {
+                            map.load_style(&req.style);
+                            state.style = req.style;
+                        }
+
+                        if state.size != req.size {
+                            map.set_size(req.size);
+                            state.size = req.size;
+                        }
+
                         map.jump_to(&JumpToOptions {
                             center: req.center,
                             zoom: Some(req.zoom),
