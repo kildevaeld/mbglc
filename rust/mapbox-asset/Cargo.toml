@@ -21,3 +21,4 @@ tokio = { version = "0.2", features = [ "blocking" ] }
 
 [dev-dependencies]
 tokio = { version = "0.2", features = [ "blocking", "macros" ] }
+serde_json = "1"

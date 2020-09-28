@@ -533,6 +533,7 @@ dependencies = [
  "image",
  "mapbox",
  "mime",
+ "serde_json",
  "tasks",
  "tasks-assets",
  "tasks-vinyl",

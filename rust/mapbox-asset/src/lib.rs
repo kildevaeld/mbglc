@@ -20,16 +20,19 @@ pub fn create(
 
             let opts = req.args_mut();
 
-            let size = opts.take("size").unwrap_or(Size(1280, 1024));
-            let center = opts.get("center").unwrap_or(LatLng(55.680191, 12.588061));
+            let size = opts.take("size").unwrap_or(Size(512, 512));
+            let center = opts.get("center").unwrap_or(LatLng(0.0, 0.0));
             let zoom = opts.get("zoom").unwrap_or(5.);
+            let style = opts
+                .get("style")
+                .unwrap_or_else(|| "mapbox://styles/mapbox/streets-v11".to_owned());
 
             let ret = pool
                 .render(MapRequest {
                     size,
                     center,
                     zoom,
-                    style: "mapbox://styles/mapbox/streets-v11".to_owned(),
+                    style,
                 })
                 .await;
 
@@ -41,7 +44,10 @@ pub fn create(
             };
 
             let name = match req.path() {
-                "/" => format!("map-{}x{}-{}x{}.png", size.0, size.1, center.0, center.1),
+                "/" => format!(
+                    "map-{}x{}-{}x{}-z{}.png",
+                    size.0, size.1, center.0, center.1, zoom
+                ),
                 path => path.to_owned(),
             };
 
