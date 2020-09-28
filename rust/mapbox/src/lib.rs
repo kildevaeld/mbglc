@@ -22,6 +22,7 @@ impl Drop for Map {
 }
 
 #[derive(Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MapOptions<'a> {
     pub width: u32,
     pub height: u32,
@@ -32,11 +33,15 @@ pub struct MapOptions<'a> {
 }
 
 #[derive(Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LatLng(pub f64, pub f64);
 
 #[derive(Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Size(pub u32, pub u32);
 
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Clone, Copy, PartialEq)]
 pub struct JumpToOptions {
     pub center: LatLng,
     pub zoom: Option<f64>,

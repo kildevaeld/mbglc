@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 mapbox-sys = { path = "../mapbox-sys" }
 image = "0.23"
-
+serde = { version = "1", features = [ "derive" ], optional = true }
