@@ -13,19 +13,22 @@ pub fn create(
     options: MapPoolOptions,
 ) -> impl Task<AssetRequest, Output = AssetResponse, Error = Error> + Clone {
     let pool = MapPool::new(options);
-    task!(move |req: AssetRequest| {
+    task!(move |mut req: AssetRequest| {
         let pool = pool.clone();
         async move {
             //
 
-            let size = Size(1280, 1024);
-            let center = LatLng(55.680191, 12.588061);
+            let opts = req.args_mut();
+
+            let size = opts.take("size").unwrap_or(Size(1280, 1024));
+            let center = opts.get("center").unwrap_or(LatLng(55.680191, 12.588061));
+            let zoom = opts.get("zoom").unwrap_or(5.);
 
             let ret = pool
                 .render(MapRequest {
                     size,
                     center,
-                    zoom: 15.,
+                    zoom,
                     style: "mapbox://styles/mapbox/streets-v11".to_owned(),
                 })
                 .await;
