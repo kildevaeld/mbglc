@@ -521,6 +521,7 @@ version = "0.1.0"
 dependencies = [
  "image",
  "mapbox-sys",
+ "serde",
 ]
 
 [[package]]
@@ -926,7 +927,7 @@ dependencies = [
 [[package]]
 name = "tasks"
 version = "0.7.0"
-source = "git+https://github.com/kildevaeld/tasks-rs#1f096ded6fb0029b3644e521fa2e79cd51a317da"
+source = "git+https://github.com/kildevaeld/tasks-rs#cb48dc54d27ac0b912ce55ba32da70fd9e65516a"
 dependencies = [
  "futures-core",
  "futures-util",
@@ -936,7 +937,7 @@ dependencies = [
 [[package]]
 name = "tasks-assets"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/tasks-rs#1f096ded6fb0029b3644e521fa2e79cd51a317da"
+source = "git+https://github.com/kildevaeld/tasks-rs#cb48dc54d27ac0b912ce55ba32da70fd9e65516a"
 dependencies = [
  "async-trait",
  "bytes",
@@ -952,7 +953,7 @@ dependencies = [
 [[package]]
 name = "tasks-vinyl"
 version = "0.1.0"
-source = "git+https://github.com/kildevaeld/tasks-rs#1f096ded6fb0029b3644e521fa2e79cd51a317da"
+source = "git+https://github.com/kildevaeld/tasks-rs#cb48dc54d27ac0b912ce55ba32da70fd9e65516a"
 dependencies = [
  "bytes",
  "failure",
