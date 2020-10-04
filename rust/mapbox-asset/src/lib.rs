@@ -4,7 +4,7 @@ use image::ImageOutputFormat;
 use mapbox::{LatLng, MapOptions, Size};
 use mime::IMAGE_PNG;
 use tasks::{task, Rejection, Task};
-use tasks_assets::{AssetRequest, AssetResponse, Error, Node};
+use tasks_assets::{Asset, AssetRequest, AssetResponse, Error};
 use tasks_vinyl::{Content, File};
 
 pub use pool::{MapPool, MapPoolOptions, Request as MapRequest};
@@ -58,7 +58,7 @@ pub fn create(
             let content = Content::from(buf.freeze());
             let file = File::new(name, content, IMAGE_PNG, len as u64);
 
-            Ok(req.reply(Node::File(file)))
+            Ok(req.reply(Asset::File(file)))
         }
     })
 }

@@ -12,8 +12,8 @@ struct Worker {
 pub struct Request {
     pub size: Size,
     pub center: LatLng,
-    pub zoom: f64,
-    pub style: String,
+    pub zoom: Option<f64>,
+    pub style: Option<String>,
 }
 
 #[derive(Clone)]
@@ -24,6 +24,9 @@ pub struct MapPoolOptions {
     pub access_token: Option<String>,
     pub cache_path: Option<String>,
     pub assets_path: Option<String>,
+    pub style: Option<String>,
+    pub zoom: Option<f32>,
+    pub custom: Option<Arc<dyn Fn(&Map) + Send + Sync>>,
 }
 
 impl Default for MapPoolOptions {
@@ -35,6 +38,9 @@ impl Default for MapPoolOptions {
             access_token: None,
             cache_path: None,
             assets_path: None,
+            style: None,
+            zoom: None,
+            custom: None,
         }
     }
 }
@@ -47,7 +53,33 @@ struct MapPoolInner {
 struct MapState {
     style: String,
     size: Size,
+    zoom: f32,
+    center: LatLng,
 }
+
+// fn render(map: &Map, state: &mut MapState, req: &Request, opts: &MapPoolOptions) {
+//     if state.center != req.center {
+//         Some(req.center)
+//     } else {
+//         None
+//     }
+//     if state.style != req.style {
+//         map.load_style(&req.style);
+//         state.style = req.style;
+//     }
+
+//     if state.size != req.size {
+//         map.set_size(req.size);
+//         state.size = req.size;
+//     }
+
+//     map.jump_to(&JumpToOptions {
+//         center: req.center,
+//         zoom: Some(req.zoom),
+//     });
+
+//     let image = map.render();
+// }
 
 impl MapPoolInner {
     fn new(options: MapPoolOptions) -> MapPoolInner {
@@ -73,9 +105,19 @@ impl MapPoolInner {
                     )
                     .unwrap();
 
+                    let default_style = opts
+                        .style
+                        .as_ref()
+                        .map(|m| m.to_owned())
+                        .unwrap_or_else(|| "mapbox://styles/mapbox/streets-v11".to_owned());
+
+                    let default_zoom = opts.zoom.unwrap_or(5.);
+
                     let mut state = MapState {
-                        style: "mapbox://styles/mapbox/streets-v11".to_owned(),
+                        style: default_style,
                         size: opts.size,
+                        zoom: default_zoom,
+                        center: LatLng(0., 0.),
                     };
 
                     map.load_style(&state.style);
