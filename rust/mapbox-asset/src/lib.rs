@@ -31,8 +31,8 @@ pub fn create(
                 .render(MapRequest {
                     size,
                     center,
-                    zoom,
-                    style,
+                    zoom: Some(zoom),
+                    style: Some(style),
                 })
                 .await;
 

@@ -130,11 +130,12 @@ impl MapPoolInner {
                             recv(work_chan) -> req => req.expect("work chan closed")
                         };
 
-                        if state.style != req.style {
-                            map.load_style(&req.style);
-                            state.style = req.style;
+                        if let Some(style) = req.style {
+                            if state.style != style {
+                                map.load_style(&style);
+                                state.style = style;
+                            }
                         }
-
                         if state.size != req.size {
                             map.set_size(req.size);
                             state.size = req.size;
@@ -142,7 +143,7 @@ impl MapPoolInner {
 
                         map.jump_to(&JumpToOptions {
                             center: req.center,
-                            zoom: Some(req.zoom),
+                            zoom: req.zoom,
                         });
 
                         let image = map.render();
