@@ -10,6 +10,7 @@ pub enum RunLoopType {
 pub struct Map {
     lraw: *mut sys::mbgl_run_loop_t,
     raw: *mut sys::mbgl_map_t,
+    render_retries: i32,
 }
 
 impl Drop for Map {
@@ -30,6 +31,21 @@ pub struct MapOptions<'a> {
     pub access_token: Option<&'a str>,
     pub cache_path: Option<&'a str>,
     pub assets_path: Option<&'a str>,
+    pub render_retries: i32,
+}
+
+impl<'a> Default for MapOptions<'a> {
+    fn default() -> MapOptions<'a> {
+        MapOptions {
+            width: 512,
+            height: 512,
+            pixel_ratio: 1,
+            access_token: None,
+            cache_path: None,
+            assets_path: None,
+            render_retries: 5,
+        }
+    }
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -48,11 +64,9 @@ pub struct JumpToOptions {
 }
 
 impl Map {
-    fn try_render(&self, retries: i32) -> Option<Vec<u8>> {
+    fn try_render(&self, retries: i32) -> Option<image::RgbaImage> {
         unsafe {
-            let mut len = 0;
-
-            let buffer = sys::mbgl_map_render(self.raw, &mut len);
+            let buffer = sys::mbgl_map_render(self.raw);
             if buffer == std::ptr::null_mut() {
                 if retries > 0 {
                     println!("try re-render {}", retries);
@@ -63,24 +77,24 @@ impl Map {
                 }
             }
 
-            let array: &[u8] = std::slice::from_raw_parts(buffer as *mut u8, len as usize);
+            let len = sys::mbgl_image_data_len(buffer);
+            let data = sys::mbgl_image_data(buffer);
+            let mut w = 0;
+            let mut h = 0;
+            sys::mbgl_image_size(buffer, &mut w, &mut h);
 
-            sys::free_buffer(buffer);
+            let array: &[u8] = std::slice::from_raw_parts(data as *mut u8, len as usize);
 
-            Some(array.to_vec())
+            let img = image::RgbaImage::from_raw(w as u32, h as u32, array.to_vec());
+
+            sys::mbgl_image_free(buffer);
+
+            img
         }
     }
 
-    pub fn render(&self) -> Option<image::DynamicImage> {
-        let result = match self.try_render(10) {
-            Some(s) => s,
-            None => return None,
-        };
-
-        match image::load_from_memory_with_format(&result, image::ImageFormat::Png) {
-            Ok(s) => Some(s),
-            Err(_) => None,
-        }
+    pub fn render(&self) -> Option<image::RgbaImage> {
+        self.try_render(self.render_retries)
     }
 
     pub fn load_style(&self, style: &str) -> &Self {
@@ -119,15 +133,7 @@ impl Map {
     }
 
     pub fn new<'a>(ty: RunLoopType, options: Option<MapOptions<'a>>) -> Option<Map> {
-        let opts = options.unwrap_or_else(|| MapOptions {
-            width: 1280,
-            height: 1024,
-            pixel_ratio: 1,
-            access_token: None,
-            cache_path: None,
-            assets_path: None,
-        });
-
+        let opts = options.unwrap_or_default();
         let (lraw, raw) = unsafe {
             let rloop = sys::mbgl_run_loop_create(ty as u32);
 
@@ -156,6 +162,10 @@ impl Map {
             return None;
         }
 
-        Some(Map { lraw, raw })
+        Some(Map {
+            lraw,
+            raw,
+            render_retries: opts.render_retries,
+        })
     }
 }
