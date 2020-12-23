@@ -18,8 +18,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         zoom: Some(18.),
     };
 
-    if let Some(image) = map.jump_to(&jump).set_size(Size(2012, 2020)).render() {
-        image.save("image.png").unwrap();
+    if let Some(image) = map.jump_to(&jump).set_size(Size(1280, 800)).render() {
+        image.save("image.jpg").unwrap();
     } else {
         println!("could not render image");
     }

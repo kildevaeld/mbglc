@@ -25,9 +25,8 @@ impl Drop for Map {
 #[derive(Clone, Copy)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct MapOptions<'a> {
-    pub width: u32,
-    pub height: u32,
-    pub pixel_ratio: i32,
+    pub size: Size,
+    pub pixel_ratio: PixelRatio,
     pub access_token: Option<&'a str>,
     pub cache_path: Option<&'a str>,
     pub assets_path: Option<&'a str>,
@@ -37,9 +36,8 @@ pub struct MapOptions<'a> {
 impl<'a> Default for MapOptions<'a> {
     fn default() -> MapOptions<'a> {
         MapOptions {
-            width: 512,
-            height: 512,
-            pixel_ratio: 1,
+            size: Size(512, 512),
+            pixel_ratio: PixelRatio::Normal,
             access_token: None,
             cache_path: None,
             assets_path: None,
@@ -48,13 +46,45 @@ impl<'a> Default for MapOptions<'a> {
     }
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum PixelRatio {
+    Normal,
+    Retina,
+}
+
+impl Default for PixelRatio {
+    fn default() -> Self {
+        PixelRatio::Normal
+    }
+}
+
+impl PixelRatio {
+    fn as_int(&self) -> i32 {
+        match self {
+            PixelRatio::Normal => 1,
+            PixelRatio::Retina => 2,
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Default, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct LatLng(pub f64, pub f64);
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Default, Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Size(pub u32, pub u32);
+
+impl Size {
+    pub const MAX: Size = Size(2000, 2000);
+    pub const MIN: Size = Size(64, 64);
+    pub fn is_valid(&self) -> bool {
+        self.0 >= Self::MIN.0
+            && self.0 <= Self::MAX.0
+            && self.1 >= Self::MIN.1
+            && self.1 <= Self::MAX.1
+    }
+}
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Copy, PartialEq)]
@@ -69,7 +99,6 @@ impl Map {
             let buffer = sys::mbgl_map_render(self.raw);
             if buffer == std::ptr::null_mut() {
                 if retries > 0 {
-                    println!("try re-render {}", retries);
                     std::thread::sleep(std::time::Duration::from_millis(100));
                     return self.try_render(retries - 1);
                 } else {
@@ -143,9 +172,9 @@ impl Map {
             };
 
             let map = sys::mbgl_map_create(
-                opts.width as i32,
-                opts.height as i32,
-                opts.pixel_ratio,
+                opts.size.0 as i32,
+                opts.size.1 as i32,
+                opts.pixel_ratio.as_int(),
                 token.as_ptr(),
                 opts.cache_path
                     .map(|s| std::ffi::CString::new(s).unwrap().as_ptr())
