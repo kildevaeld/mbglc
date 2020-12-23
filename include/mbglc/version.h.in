@@ -1,17 +1,6 @@
-/* version.h
-   Kip Warner, 25 May 2019
-
-   Version constants
-*/
-
 #pragma once
 
 #define MBGLC_VERSION_MAJOR @VERSION_MAJOR@;
 #define MBGLC_VERSION_MINOR @VERSION_MINOR@;
 #define MBGLC_VERSION_PATCH @VERSION_PATCH@;
 #define MBGLC_VERSION "@VERSION_MAJOR@.@VERSION_MINOR@.@VERSION_PATCH@"
-
-//     static constexpr int Patch = @VERSION_PATCH@;
-//     static constexpr int Git   = @VERSION_GIT_DATE@;
-// } // namespace Version
-// } // namespace Pistache

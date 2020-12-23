@@ -105,14 +105,6 @@ fn main() {
     env::set_var("CC", "clang");
     env::set_var("CXX", "clang++");
 
-    // let dst = cmake::Config::new("../../").build();
-
-    // println!(
-    //     "cargo:rustc-link-search=native={}",
-    //     dst.join("lib").display()
-    // );
-
-    // println!("cargo:rustc-link-lib=dylib=mbglc");
     let include_path = if let Ok(lib) = probe_library("mbglc") {
         Path::new(lib.include_paths.first().unwrap()).to_path_buf()
     } else {
@@ -140,11 +132,6 @@ fn main() {
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
-    // println!(
-    //     "cargo:rustc-link-search=native={}",
-    //     dst.join("lib").display()
-    // );
-    // println!("cargo:rustc-link-lib=dylib=mbglc");
 
     cc::Build::new()
         .file("wrapper.c")
