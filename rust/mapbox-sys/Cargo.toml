@@ -6,6 +6,6 @@ edition = "2018"
 
 [build-dependencies]
 cmake = "0.1"
-bindgen = "0.55"
+bindgen = "0.56"
 pkg-config = "0.3"
 cc = "1"

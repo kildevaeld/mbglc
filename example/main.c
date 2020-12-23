@@ -28,7 +28,7 @@ int main()
     mbgl_map_load_style_url(map, "mapbox://styles/mapbox/streets-v11");
 
     size_t len;
-    char *image = mbgl_map_render(map, &len);
+    char *image = mbgl_map_render_png(map, &len);
 
     if (image == NULL)
     {

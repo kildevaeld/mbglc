@@ -10,3 +10,4 @@ edition = "2018"
 mapbox-sys = { path = "../mapbox-sys" }
 image = "0.23"
 serde = { version = "1", features = [ "derive" ], optional = true }
+log = "0.4"
