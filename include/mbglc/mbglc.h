@@ -30,6 +30,8 @@ extern "C"
         const char *base_url;
     } mbgl_map_options_t;
 
+    typedef struct mbgl_image mbgl_image_t;
+
     typedef struct mbgl_run_loop mbgl_run_loop_t;
     typedef struct mbgl_map mbgl_map_t;
 
@@ -49,7 +51,16 @@ extern "C"
 
     void mbgl_map_load_style_url(mbgl_map_t *, const char *url);
 
-    char *mbgl_map_render(mbgl_map_t *, size_t *);
+    mbgl_image_t *mbgl_map_render(mbgl_map_t *);
+
+    char *mbgl_map_render_png(mbgl_map_t *, size_t *);
+
+    // Image
+    void mbgl_image_free(mbgl_image_t *);
+    size_t mbgl_image_data_len(mbgl_image_t *);
+    size_t mbgl_image_stride(mbgl_image_t *);
+    char *mbgl_image_data(mbgl_image_t *);
+    void mbgl_image_size(mbgl_image_t *, int *width, int *height);
 
 #ifdef __cplusplus
 }

@@ -33,6 +33,11 @@ struct mbgl_buffer
     std::string buffer;
 };
 
+struct mbgl_image
+{
+    mbgl::PremultipliedImage image;
+};
+
 mbgl_run_loop_t *mbgl_run_loop_create(mbgl_runloop_type type)
 {
     auto t = util::RunLoop::Type::Default;
@@ -77,6 +82,7 @@ mbgl_map_t *mbgl_map_create(int w, int h, int pixel, const char *access, const c
         resource.withAssetPath(assets_path);
 
     auto map = std::make_unique<Map>(*frontend, MapObserver::nullObserver(), MapOptions().withSize(frontend->getSize()).withMapMode(MapMode::Static), resource);
+
     return new mbgl_map_t{std::move(frontend), std::move(map), 20};
 }
 
@@ -93,7 +99,31 @@ void mbgl_map_load_style_url(mbgl_map_t *map, const char *url)
     map->map->getStyle().loadURL(url);
 }
 
-char *mbgl_map_render(mbgl_map_t *map, size_t *len)
+mbgl_image_t *mbgl_map_render(mbgl_map_t *map)
+{
+    try
+    {
+
+        auto result = map->frontend->render(*map->map);
+        if (result.stats.isZero() || !result.image.valid())
+        {
+
+            return NULL;
+        }
+
+        mbgl_image_t *ca = (mbgl_image_t *)std::malloc(sizeof(mbgl_image_t));
+
+        ca->image = std::move(result.image);
+
+        return ca;
+    }
+    catch (std::exception &e)
+    {
+        return NULL;
+    }
+}
+
+char *mbgl_map_render_png(mbgl_map_t *map, size_t *len)
 {
     try
     {
@@ -135,4 +165,30 @@ void mbgl_map_jump_to(mbgl_map_t *map, mbgl_latlng_t c, double zoom)
 {
     LatLng center{c.lat, c.lng};
     map->map->jumpTo(CameraOptions().withCenter(center).withZoom(zoom));
+}
+
+void mbgl_image_free(mbgl_image_t *img)
+{
+    if (img)
+    {
+        free(img);
+    }
+}
+size_t mbgl_image_data_len(mbgl_image_t *img)
+{
+    return img->image.bytes();
+}
+size_t mbgl_image_stride(mbgl_image_t *img)
+{
+    return img->image.stride();
+}
+char *mbgl_image_data(mbgl_image_t *img)
+{
+    return (char *)img->image.data.get();
+}
+
+void mbgl_image_size(mbgl_image_t *img, int *width, int *height)
+{
+    *width = img->image.size.width;
+    *height = img->image.size.height;
 }
